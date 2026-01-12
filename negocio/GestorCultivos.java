@@ -2,6 +2,7 @@ package granjaautomatizada.negocio;
 
 import granjaautomatizada.modelo.Cultivo;
 import granjaautomatizada.modelo.Parcela;
+import granjaautomatizada.utilitario.Util;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -29,24 +30,25 @@ public class GestorCultivos {
             System.out.println("\nParcela: " + parcela.getId()
                     + " (" + parcela.getMetrosCuadrados() + " m²)");
 
-            System.out.print("¿Desea sembrar un cultivo aquí? (1=Sí / 0=No): ");
-            int opcion = scanner.nextInt();
-            scanner.nextLine(); // limpiar buffer
+            //Validacion
+            int opcion;
+            do {
+                opcion = Util.leerEntero(scanner, "¿Desea sembrar un cultivo aquí? (1=Sí / 0=No): ");
+
+                if (opcion != 0 && opcion != 1) {
+                    System.out.println(" Opción inválida. Por favor ingrese solo 1 o 0.");
+                }
+            } while (opcion != 0 && opcion !=1);
 
             if (opcion == 1) {
 
                 System.out.print("Nombre del cultivo: ");
                 String nombre = scanner.nextLine();
 
-                System.out.print("Humedad mínima requerida (%): ");
-                int humedadMin = scanner.nextInt();
+                int humedadMin = Util.leerEntero(scanner, "Humedad mínima requerida (%): ");
+                int humedadMax = Util.leerEntero(scanner, "Humedad máxima permitida (%): ");
+                int frecuencia = Util.leerEntero(scanner, "Cada cuántas horas se riega: ");
 
-                System.out.print("Humedad máxima permitida (%): ");
-                int humedadMax = scanner.nextInt();
-
-                System.out.print("Cada cuántas horas se riega: ");
-                int frecuencia = scanner.nextInt();
-                scanner.nextLine(); // limpiar buffer
 
                 Cultivo cultivo = new Cultivo(
                         nombre,
@@ -61,11 +63,11 @@ public class GestorCultivos {
                 // Guardamos cultivo en la lista general
                 cultivosRegistrados.add(cultivo);
 
-                System.out.println("✔ Cultivo " + nombre
+                System.out.println(" Cultivo " + nombre
                         + " registrado en " + parcela.getId());
 
             } else {
-                System.out.println("⚠ Parcela sin cultivo.");
+                System.out.println(" Parcela sin cultivo.");
             }
         }
     }
@@ -92,7 +94,7 @@ public class GestorCultivos {
         }
 
         if (!hayCultivos) {
-            System.out.println("⚠ No hay cultivos registrados.");
+            System.out.println("No hay cultivos registrados.");
         }
     }
     // Cambia el cultivo de una parcela
@@ -112,7 +114,7 @@ public class GestorCultivos {
         }
 
         if (!hayParcelasConCultivo) {
-            System.out.println("⚠ No hay parcelas con cultivo.");
+            System.out.println("No hay parcelas con cultivo.");
             return;
         }
 
@@ -130,7 +132,7 @@ public class GestorCultivos {
         }
 
         if (parcelaSeleccionada == null || parcelaSeleccionada.getCultivo() == null) {
-            System.out.println("⚠ Parcela inválida o sin cultivo.");
+            System.out.println(" Parcela inválida o sin cultivo.");
             return;
         }
 
@@ -142,19 +144,14 @@ public class GestorCultivos {
         System.out.print("Nombre del cultivo: ");
         String nombre = scanner.nextLine();
 
-        System.out.print("Humedad mínima (%): ");
-        int min = scanner.nextInt();
-
-        System.out.print("Humedad máxima (%): ");
-        int max = scanner.nextInt();
-
-        System.out.print("Frecuencia de riego (horas): ");
-        int freq = scanner.nextInt();
+        int min = Util.leerEntero(scanner, "Humedad mínima (%): ");
+        int max = Util.leerEntero(scanner, "Humedad máxima (%): ");
+        int freq = Util.leerEntero(scanner, "Frecuencia de riego (horas): ");
 
         Cultivo nuevo = new Cultivo(nombre, min, max, freq);
         parcelaSeleccionada.setCultivo(nuevo);
 
-        System.out.println("✔ Cultivo cambiado correctamente en "
+        System.out.println(" Cultivo cambiado correctamente en "
                 + parcelaSeleccionada.getId());
     }
 

@@ -18,8 +18,8 @@ public class GestorParcelas {
     // Método que crea parcelas a partir del terreno ingresado
     public void crearParcelasDesdeTerreno(Scanner scanner) {
 
-        System.out.print("Ingrese la cantidad total de terreno en m²: ");
-        double terrenoTotal = scanner.nextDouble();
+
+        double terrenoTotal = Util.leerEnteroPositivo(scanner, "Ingrese la cantidad total de terreno en m²: ");
 
         double terrenoRestante = terrenoTotal;
 
@@ -44,7 +44,7 @@ public class GestorParcelas {
             // Se agrega la parcela al sistema
             gestorGranja.getParcelas().add(parcela);
 
-            System.out.println("✔ Parcela creada: " + idParcela +
+            System.out.println("Parcela creada: " + idParcela +
                     " | Tamaño: " + tamanioParcela + " m²");
 
             terrenoRestante -= tamanioParcela;
@@ -62,26 +62,53 @@ public class GestorParcelas {
 
     private void asignarAspersoresYSensores(Scanner scanner) {
 
-        System.out.print("\nIngrese la cantidad de aspersores disponibles: ");
-        int cantidadAspersores = scanner.nextInt();
 
-        System.out.print("Ingrese la cantidad de sensores de humedad disponibles: ");
-        int cantidadSensores = scanner.nextInt();
+        int cantidadAspersores;
+        do {
+            cantidadAspersores=Util.leerEntero(scanner, "\nIngrese la cantidad de aspersores disponibles (Positivo)");
+            if (cantidadAspersores < 0) System.out.println(" Error: No puedes ingresar números negativos.");
+        } while (cantidadAspersores < 0);
+
+        int cantidadSensores;
+        do {
+            cantidadSensores = Util.leerEntero(scanner, "Ingrese la cantidad de sensores disponibles (Positivo)");
+            if (cantidadSensores < 0) System.out.println(" Error: No puedes ingresar números negativos.");
+        } while (cantidadSensores < 0);
 
         // Crear aspersores en inventario
-        for (int i = 1; i <= cantidadAspersores; i++) {
-            String id = Util.generarId("ASPERSOR", i);
+        for (int i = 0; i < cantidadAspersores; i++) {
+            // Pedimos el siguiente número único al gestor
+            int siguienteNum = gestorGranja.getSiguienteIdAspersor();
+            String id = Util.generarId("ASPERSOR", siguienteNum);
+
             gestorGranja.getAspersoresInventario().add(
                     new granjaautomatizada.modelo.Aspersor(id)
             );
         }
 
         // Crear sensores en inventario
-        for (int i = 1; i <= cantidadSensores; i++) {
-            String id = Util.generarId("SENSOR", i);
+        for (int i = 0; i < cantidadSensores; i++) {
+            int siguienteNum = gestorGranja.getSiguienteIdSensor();
+            String id = Util.generarId("SENSOR", siguienteNum);
+
             gestorGranja.getSensoresInventario().add(
                     new granjaautomatizada.modelo.SensorHumedad(id)
             );
+        }
+
+        // VERIFICACIÓN CORRECTA PARA TU CÓDIGO (Uno a Uno)
+        int totalParcelas = gestorGranja.getParcelas().size();
+
+        if (cantidadAspersores < totalParcelas) {
+            System.out.println("\nADVERTENCIA: Tienes " + totalParcelas + " parcelas pero solo "
+                    + cantidadAspersores + " aspersores.");
+            System.out.println("Las últimas " + (totalParcelas - cantidadAspersores) + " parcelas se quedarán sin aspersor.");
+        }
+
+        if (cantidadSensores < totalParcelas) {
+            System.out.println("\nADVERTENCIA: Tienes " + totalParcelas + " parcelas pero solo "
+                    + cantidadSensores + " sensores.");
+            System.out.println("Las últimas " + (totalParcelas - cantidadSensores) + " parcelas se quedarán sin sensor.");
         }
 
         System.out.println("\nAsignando aspersores y sensores a parcelas...\n");
@@ -100,7 +127,7 @@ public class GestorParcelas {
                 parcela.getAspersores().add(aspersor);
                 indiceAspersor++;
             } else {
-                System.out.println("⚠ La " + parcela.getId()
+                System.out.println("La " + parcela.getId()
                         + " NO tiene aspersor asignado.");
             }
 
@@ -112,7 +139,7 @@ public class GestorParcelas {
                 parcela.getSensores().add(sensor);
                 indiceSensor++;
             } else {
-                System.out.println("⚠ La " + parcela.getId()
+                System.out.println("La " + parcela.getId()
                         + " NO tiene sensor asignado.");
             }
         }
@@ -147,7 +174,7 @@ public class GestorParcelas {
     public void eliminarParcela(Scanner scanner) {
 
         if (gestorGranja.getParcelas().isEmpty()) {
-            System.out.println("⚠ No hay parcelas para eliminar.");
+            System.out.println("No hay parcelas para eliminar.");
             return;
         }
 
@@ -170,7 +197,7 @@ public class GestorParcelas {
         }
 
         if (parcelaEliminar == null) {
-            System.out.println("⚠ Parcela no encontrada.");
+            System.out.println("Parcela no encontrada.");
             return;
         }
 
@@ -178,7 +205,7 @@ public class GestorParcelas {
         String confirmacion = scanner.next();
 
         if (!confirmacion.equals(id)) {
-            System.out.println("❌ Confirmación incorrecta. Operación cancelada.");
+            System.out.println("Confirmación incorrecta. Operación cancelada.");
             return;
         }
 
@@ -196,7 +223,7 @@ public class GestorParcelas {
         // Eliminar parcela
         gestorGranja.getParcelas().remove(parcelaEliminar);
 
-        System.out.println("✔ Parcela " + id + " eliminada correctamente.");
+        System.out.println(" Parcela " + id + " eliminada correctamente.");
     }
 
 }

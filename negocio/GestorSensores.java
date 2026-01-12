@@ -66,15 +66,13 @@ public class GestorSensores {
     }
     // Agregar nuevos sensores al inventario
     public void agregarSensoresAlInventario(int cantidad) {
-
-        int inicio = gestorGranja.getSensoresInventario().size() + 1;
-
         for (int i = 0; i < cantidad; i++) {
-            String id = granjaautomatizada.utilitario.Util.generarId("SENSOR", inicio + i);
+            int siguienteNum = gestorGranja.getSiguienteIdSensor();
+            String id = granjaautomatizada.utilitario.Util.generarId("SENSOR", siguienteNum);
             gestorGranja.getSensoresInventario().add(new SensorHumedad(id));
         }
 
-        System.out.println("✔ Se agregaron " + cantidad + " sensores al inventario.");
+        System.out.println(" Se agregaron " + cantidad + " sensores al inventario.");
     }
     // Asignar un sensor del inventario a una parcela
     public void asignarSensorAParcela(String idParcela) {
@@ -89,7 +87,7 @@ public class GestorSensores {
         }
 
         if (disponible == null) {
-            System.out.println("⚠ No hay sensores disponibles en el inventario.");
+            System.out.println(" No hay sensores disponibles en el inventario.");
             return;
         }
 
@@ -97,13 +95,13 @@ public class GestorSensores {
             if (parcela.getId().equals(idParcela)) {
                 disponible.setParcela(parcela);
                 parcela.getSensores().add(disponible);
-                System.out.println("✔ Sensor " + disponible.getId()
+                System.out.println(" Sensor " + disponible.getId()
                         + " asignado a " + parcela.getId());
                 return;
             }
         }
 
-        System.out.println("⚠ Parcela no encontrada.");
+        System.out.println(" Parcela no encontrada.");
     }
     // Muestra la humedad actual de todas las parcelas
     public void mostrarHumedadParcelas() {
@@ -147,7 +145,7 @@ public class GestorSensores {
         System.out.println("\n=== HISTORIAL DE LECTURAS DE SENSOR ===");
 
         if (gestorGranja.getSensoresInventario().isEmpty()) {
-            System.out.println("⚠ No hay sensores registrados.");
+            System.out.println(" No hay sensores registrados.");
             return;
         }
 
@@ -170,12 +168,12 @@ public class GestorSensores {
         }
 
         if (sensor == null) {
-            System.out.println("⚠ Sensor no encontrado.");
+            System.out.println(" Sensor no encontrado.");
             return;
         }
 
         if (sensor.getLecturas().isEmpty()) {
-            System.out.println("⚠ El sensor no tiene lecturas.");
+            System.out.println(" El sensor no tiene lecturas.");
             return;
         }
 
@@ -216,7 +214,7 @@ public class GestorSensores {
 
         sensor.setConectado(!sensor.isConectado());
 
-        System.out.println("✔ Estado cambiado. Ahora está "
+        System.out.println(" Estado cambiado. Ahora está "
                 + (sensor.isConectado() ? "CONECTADO" : "DESCONECTADO"));
     }
     // Eliminar sensor completamente
@@ -241,19 +239,19 @@ public class GestorSensores {
         }
 
         if (sensor == null) {
-            System.out.println("⚠ Sensor no encontrado.");
+            System.out.println(" Sensor no encontrado.");
             return;
         }
 
         if (sensor.getParcela() != null) {
             sensor.getParcela().getSensores().remove(sensor);
-            System.out.println("⚠ "
+            System.out.println(" "
                     + sensor.getParcela().getId()
                     + " quedó sin sensor.");
         }
 
         gestorGranja.getSensoresInventario().remove(sensor);
-        System.out.println("✔ Sensor eliminado correctamente.");
+        System.out.println(" Sensor eliminado correctamente.");
     }
 
 }

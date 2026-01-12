@@ -23,9 +23,9 @@ public class GestorAspersores {
 
             if (cultivo == null) continue;
 
-            // Tomamos el primer sensor disponible
+
             if (parcela.getSensores().isEmpty()) {
-                System.out.println("⚠ " + parcela.getId()
+                System.out.println(" " + parcela.getId()
                         + " no tiene sensor.");
                 continue;
             }
@@ -34,44 +34,49 @@ public class GestorAspersores {
             LecturaHumedad lectura = sensor.leerHumedad();
 
             if (lectura == null) {
-                System.out.println("⚠ Sensor desconectado en "
+                System.out.println(" Sensor desconectado en "
                         + parcela.getId());
                 continue;
             }
 
             int humedad = lectura.getPorcentajeHumedad();
 
-            // Verificamos si necesita riego
+            Aspersor aspersor = null;
+            if (!parcela.getAspersores().isEmpty()) {
+                aspersor = parcela.getAspersores().get(0);
+            }
+
             if (humedad < cultivo.getHumedadMinima()) {
 
-                if (parcela.getAspersores().isEmpty()) {
-                    System.out.println("⚠ " + parcela.getId()
-                            + " no tiene aspersor.");
-                    continue;
+
+                if (aspersor == null) {
+                    System.out.println(parcela.getId() + " necesita riego, pero NO tiene aspersor.");
+                } else if (!aspersor.isConectado()) {
+                    System.out.println(" Aspersor desconectado en " + parcela.getId());
+                } else {
+                    if (!aspersor.isEncendido()) {
+                        aspersor.encender();
+                        System.out.println(" RIEGO ACTIVADO en " + parcela.getId()
+                                + " | Humedad actual: " + humedad + "%");
+                    } else {
+                        System.out.println(parcela.getId() + " sigue regando...");
+                    }
                 }
-
-                Aspersor aspersor = parcela.getAspersores().get(0);
-
-                if (!aspersor.isConectado()) {
-                    System.out.println("⚠ Aspersor desconectado en "
-                            + parcela.getId());
-                    continue;
-                }
-
-                aspersor.encender();
-
-                System.out.println("💧 RIEGO ACTIVADO en "
-                        + parcela.getId()
-                        + " | Humedad actual: "
-                        + humedad + "%");
-
             } else {
-                System.out.println("✔ " + parcela.getId()
-                        + " humedad correcta: "
-                        + humedad + "%");
+                // CASO: HUMEDAD CORRECTA (Intenta apagar)
+                if (aspersor != null && aspersor.isEncendido()) {
+                    aspersor.apagar();
+                    System.out.println("Riego DETENIDO en " + parcela.getId()
+                            + " (Humedad recuperada: " + humedad + "%)");
+                } else {
+                    System.out.println(parcela.getId()
+                            + " humedad correcta: " + humedad + "%");
+                }
             }
         }
     }
+
+
     // Muestra información de todos los aspersores
     public void mostrarInfoAspersores() {
 
@@ -107,16 +112,14 @@ public class GestorAspersores {
     }
     // Agregar nuevos aspersores al inventario
     public void agregarAspersoresAlInventario(int cantidad) {
-
-        int inicio = gestorGranja.getAspersoresInventario().size() + 1;
-
         for (int i = 0; i < cantidad; i++) {
-            String id = granjaautomatizada.utilitario.Util.generarId("ASPERSOR", inicio + i);
+            int siguienteNum=gestorGranja.getSiguienteIdAspersor();
+            String id = granjaautomatizada.utilitario.Util.generarId("ASPERSOR", siguienteNum);
             gestorGranja.getAspersoresInventario().add(new Aspersor(id));
         }
-
-        System.out.println("✔ Se agregaron " + cantidad + " aspersores al inventario.");
+        System.out.println(" Se agregaron " + cantidad + " aspersores al inventario.");
     }
+
     // Asignar un aspersor del inventario a una parcela
     public void asignarAspersorAParcela(String idParcela) {
 
@@ -130,7 +133,7 @@ public class GestorAspersores {
         }
 
         if (disponible == null) {
-            System.out.println("⚠ No hay aspersores disponibles en el inventario.");
+            System.out.println("No hay aspersores disponibles en el inventario.");
             return;
         }
 
@@ -138,13 +141,13 @@ public class GestorAspersores {
             if (parcela.getId().equals(idParcela)) {
                 disponible.setParcela(parcela);
                 parcela.getAspersores().add(disponible);
-                System.out.println("✔ Aspersor " + disponible.getId()
+                System.out.println("Aspersor " + disponible.getId()
                         + " asignado a " + parcela.getId());
                 return;
             }
         }
 
-        System.out.println("⚠ Parcela no encontrada.");
+        System.out.println("Parcela no encontrada.");
     }
     // Muestra historial de activaciones de un aspersor
     public void mostrarHistorialAspersor(Scanner scanner) {
@@ -152,7 +155,7 @@ public class GestorAspersores {
         System.out.println("\n=== HISTORIAL DE ASPERSOR ===");
 
         if (gestorGranja.getAspersoresInventario().isEmpty()) {
-            System.out.println("⚠ No hay aspersores registrados.");
+            System.out.println("No hay aspersores registrados.");
             return;
         }
 
@@ -175,12 +178,12 @@ public class GestorAspersores {
         }
 
         if (aspersor == null) {
-            System.out.println("⚠ Aspersor no encontrado.");
+            System.out.println("Aspersor no encontrado.");
             return;
         }
 
         if (aspersor.getHistorialEncendidos().isEmpty()) {
-            System.out.println("⚠ El aspersor nunca se ha encendido.");
+            System.out.println("El aspersor nunca se ha encendido.");
             return;
         }
 
@@ -216,18 +219,18 @@ public class GestorAspersores {
         }
 
         if (aspersor == null) {
-            System.out.println("⚠ Aspersor no encontrado.");
+            System.out.println("Aspersor no encontrado.");
             return;
         }
 
         if (!aspersor.isConectado()) {
-            System.out.println("⚠ El aspersor está DESCONECTADO. No se puede encender.");
+            System.out.println("El aspersor está DESCONECTADO. No se puede encender.");
             return;
         }
 
         aspersor.encender();
 
-        System.out.println("✔ Aspersor " + aspersor.getId()
+        System.out.println("Aspersor " + aspersor.getId()
                 + " encendido manualmente.");
     }
     // Conectar o desconectar aspersor
@@ -253,13 +256,13 @@ public class GestorAspersores {
         }
 
         if (aspersor == null) {
-            System.out.println("⚠ Aspersor no encontrado.");
+            System.out.println("Aspersor no encontrado.");
             return;
         }
 
         aspersor.setConectado(!aspersor.isConectado());
 
-        System.out.println("✔ Estado cambiado. Ahora está "
+        System.out.println("Estado cambiado. Ahora está "
                 + (aspersor.isConectado() ? "CONECTADO" : "DESCONECTADO"));
     }
     // Eliminar aspersor completamente
@@ -284,19 +287,18 @@ public class GestorAspersores {
         }
 
         if (aspersor == null) {
-            System.out.println("⚠ Aspersor no encontrado.");
+            System.out.println("Aspersor no encontrado.");
             return;
         }
 
         if (aspersor.getParcela() != null) {
             aspersor.getParcela().getAspersores().remove(aspersor);
-            System.out.println("⚠ "
-                    + aspersor.getParcela().getId()
+            System.out.println(aspersor.getParcela().getId()
                     + " quedó sin aspersor.");
         }
 
         gestorGranja.getAspersoresInventario().remove(aspersor);
-        System.out.println("✔ Aspersor eliminado correctamente.");
+        System.out.println("Aspersor eliminado correctamente.");
     }
 
 }
