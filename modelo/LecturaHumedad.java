@@ -3,7 +3,6 @@ package granjaautomatizada.modelo;
 
 import java.time.LocalDateTime;
 
-// Representa una lectura de humedad hecha por un sensor
 public class LecturaHumedad {
 
     private LocalDateTime fecha;

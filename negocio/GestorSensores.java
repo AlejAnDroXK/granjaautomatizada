@@ -11,29 +11,6 @@ public class GestorSensores {
     public GestorSensores(GestorGranja gestorGranja) {
         this.gestorGranja = gestorGranja;
     }
-
-    // Simula lecturas de todos los sensores
-    public void simularLecturas() {
-
-        for (Parcela parcela : gestorGranja.getParcelas()) {
-
-            for (SensorHumedad sensor : parcela.getSensores()) {
-
-                LecturaHumedad lectura = sensor.leerHumedad();
-
-                if (lectura != null) {
-                    System.out.println("Sensor " + sensor.getId()
-                            + " | Parcela " + parcela.getId()
-                            + " | Humedad: "
-                            + lectura.getPorcentajeHumedad() + "%");
-                } else {
-                    System.out.println("⚠ Sensor " + sensor.getId()
-                            + " está desconectado.");
-                }
-            }
-        }
-    }
-    // Muestra información de todos los sensores
     public void mostrarInfoSensores() {
 
         System.out.println("\n=== INFORMACIÓN DE SENSORES DE HUMEDAD ===");
@@ -64,7 +41,6 @@ public class GestorSensores {
                     + (sensor.isConectado() ? "CONECTADO" : "DESCONECTADO"));
         }
     }
-    // Agregar nuevos sensores al inventario
     public void agregarSensoresAlInventario(int cantidad) {
         for (int i = 0; i < cantidad; i++) {
             int siguienteNum = gestorGranja.getSiguienteIdSensor();
@@ -74,7 +50,6 @@ public class GestorSensores {
 
         System.out.println(" Se agregaron " + cantidad + " sensores al inventario.");
     }
-    // Asignar un sensor del inventario a una parcela
     public void asignarSensorAParcela(String idParcela) {
 
         SensorHumedad disponible = null;
@@ -103,7 +78,6 @@ public class GestorSensores {
 
         System.out.println(" Parcela no encontrada.");
     }
-    // Muestra la humedad actual de todas las parcelas
     public void mostrarHumedadParcelas() {
 
         System.out.println("\n=== HUMEDAD ACTUAL DE LAS PARCELAS ===");
@@ -139,7 +113,6 @@ public class GestorSensores {
                     + ultima.getPorcentajeHumedad() + "%");
         }
     }
-    // Muestra el historial de lecturas de un sensor
     public void mostrarLecturasSensor(Scanner scanner) {
 
         System.out.println("\n=== HISTORIAL DE LECTURAS DE SENSOR ===");
@@ -185,7 +158,6 @@ public class GestorSensores {
                     + lectura.getPorcentajeHumedad() + "%");
         }
     }
-    // Conectar o desconectar sensor
     public void cambiarConexionSensor(Scanner scanner) {
 
         System.out.println("\n=== CONECTAR / DESCONECTAR SENSOR ===");
@@ -217,39 +189,30 @@ public class GestorSensores {
         System.out.println(" Estado cambiado. Ahora está "
                 + (sensor.isConectado() ? "CONECTADO" : "DESCONECTADO"));
     }
-    // Eliminar sensor completamente
     public void eliminarSensor(Scanner scanner) {
-
         System.out.println("\n=== ELIMINAR SENSOR ===");
-
         for (SensorHumedad s : gestorGranja.getSensoresInventario()) {
             System.out.println(s.getId());
         }
-
         System.out.print("\nIngrese el ID del sensor a eliminar: ");
         String id = scanner.next();
-
         SensorHumedad sensor = null;
-
         for (SensorHumedad s : gestorGranja.getSensoresInventario()) {
             if (s.getId().equals(id)) {
                 sensor = s;
                 break;
             }
         }
-
         if (sensor == null) {
             System.out.println(" Sensor no encontrado.");
             return;
         }
-
         if (sensor.getParcela() != null) {
             sensor.getParcela().getSensores().remove(sensor);
             System.out.println(" "
                     + sensor.getParcela().getId()
                     + " quedó sin sensor.");
         }
-
         gestorGranja.getSensoresInventario().remove(sensor);
         System.out.println(" Sensor eliminado correctamente.");
     }

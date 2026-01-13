@@ -2,6 +2,7 @@ package granjaautomatizada.negocio;
 
 
 import granjaautomatizada.modelo.*;
+import granjaautomatizada.utilitario.GranjaException;
 
 import java.time.LocalDateTime;
 import java.util.Scanner;
@@ -14,7 +15,6 @@ public class GestorAspersores {
         this.gestorGranja = gestorGranja;
     }
 
-    // Evalúa humedad y riega automáticamente si es necesario
     public void evaluarYRiegoAutomatico() {
 
         for (Parcela parcela : gestorGranja.getParcelas()) {
@@ -63,7 +63,6 @@ public class GestorAspersores {
                     }
                 }
             } else {
-                // CASO: HUMEDAD CORRECTA (Intenta apagar)
                 if (aspersor != null && aspersor.isEncendido()) {
                     aspersor.apagar();
                     System.out.println("Riego DETENIDO en " + parcela.getId()
@@ -76,11 +75,9 @@ public class GestorAspersores {
         }
     }
 
-
-    // Muestra información de todos los aspersores
     public void mostrarInfoAspersores() {
 
-        System.out.println("\n=== INFORMACIÓN DE ASPERSORES ===");
+        System.out.println("\n----- INFORMACIÓN DE ASPERSORES -----");
         System.out.println("Cantidad total de aspersores: "
                 + gestorGranja.getAspersoresInventario().size());
 
@@ -110,7 +107,6 @@ public class GestorAspersores {
                     + (aspersor.isConectado() ? "CONECTADO" : "DESCONECTADO"));
         }
     }
-    // Agregar nuevos aspersores al inventario
     public void agregarAspersoresAlInventario(int cantidad) {
         for (int i = 0; i < cantidad; i++) {
             int siguienteNum=gestorGranja.getSiguienteIdAspersor();
@@ -120,12 +116,11 @@ public class GestorAspersores {
         System.out.println(" Se agregaron " + cantidad + " aspersores al inventario.");
     }
 
-    // Asignar un aspersor del inventario a una parcela
-    public void asignarAspersorAParcela(String idParcela) {
+    public void asignarAspersorAParcela(String idParcela) throws GranjaException {
 
-        Aspersor disponible = null;
+        granjaautomatizada.modelo.Aspersor disponible = null;
 
-        for (Aspersor a : gestorGranja.getAspersoresInventario()) {
+        for (granjaautomatizada.modelo.Aspersor a : gestorGranja.getAspersoresInventario()) {
             if (a.getParcela() == null) {
                 disponible = a;
                 break;
@@ -133,26 +128,31 @@ public class GestorAspersores {
         }
 
         if (disponible == null) {
-            System.out.println("No hay aspersores disponibles en el inventario.");
-            return;
+            throw new GranjaException("No quedan aspersores libres en el inventario (Use la opción 7)");
         }
 
+        granjaautomatizada.modelo.Parcela parcelaDestino = null;
+
         for (granjaautomatizada.modelo.Parcela parcela : gestorGranja.getParcelas()) {
-            if (parcela.getId().equals(idParcela)) {
-                disponible.setParcela(parcela);
-                parcela.getAspersores().add(disponible);
-                System.out.println("Aspersor " + disponible.getId()
-                        + " asignado a " + parcela.getId());
-                return;
+            if (parcela.getId().equalsIgnoreCase(idParcela)) {
+                parcelaDestino = parcela;
+                break;
             }
         }
 
-        System.out.println("Parcela no encontrada.");
+        if (parcelaDestino == null) {
+            throw new GranjaException("No se encontró la parcela con ID: " + idParcela);
+        }
+
+        disponible.setParcela(parcelaDestino);
+        parcelaDestino.getAspersores().add(disponible);
+
+        System.out.println("Aspersor " + disponible.getId()
+                + " asignado a " + parcelaDestino.getId());
     }
-    // Muestra historial de activaciones de un aspersor
     public void mostrarHistorialAspersor(Scanner scanner) {
 
-        System.out.println("\n=== HISTORIAL DE ASPERSOR ===");
+        System.out.println("\n----- HISTORIAL DE ASPERSOR -----");
 
         if (gestorGranja.getAspersoresInventario().isEmpty()) {
             System.out.println("No hay aspersores registrados.");
@@ -165,7 +165,7 @@ public class GestorAspersores {
                     + (a.getParcela() != null ? a.getParcela().getId() : "SIN PARCELA"));
         }
 
-        System.out.print("\nIngrese el ID del aspersor: ");
+        System.out.print("\n Ingrese el ID del aspersor: ");
         String id = scanner.next();
 
         Aspersor aspersor = null;
@@ -194,10 +194,9 @@ public class GestorAspersores {
             System.out.println("Encendido en: " + fecha);
         }
     }
-    // Encendido manual de aspersor
     public void prenderAspersorManual(Scanner scanner) {
 
-        System.out.println("\n=== ENCENDER ASPERSOR MANUALMENTE ===");
+        System.out.println("\n----- ENCENDER ASPERSOR MANUALMENTE -----");
 
         for (Aspersor a : gestorGranja.getAspersoresInventario()) {
             System.out.println(a.getId()
@@ -206,7 +205,7 @@ public class GestorAspersores {
                     + " | Conectado: " + a.isConectado());
         }
 
-        System.out.print("\nIngrese el ID del aspersor: ");
+        System.out.print("\n Ingrese el ID del aspersor: ");
         String id = scanner.next();
 
         Aspersor aspersor = null;
@@ -233,10 +232,9 @@ public class GestorAspersores {
         System.out.println("Aspersor " + aspersor.getId()
                 + " encendido manualmente.");
     }
-    // Conectar o desconectar aspersor
     public void cambiarConexionAspersor(Scanner scanner) {
 
-        System.out.println("\n=== CONECTAR / DESCONECTAR ASPERSOR ===");
+        System.out.println("\n----- CONECTAR / DESCONECTAR ASPERSOR -----");
 
         for (Aspersor a : gestorGranja.getAspersoresInventario()) {
             System.out.println(a.getId()
@@ -265,10 +263,9 @@ public class GestorAspersores {
         System.out.println("Estado cambiado. Ahora está "
                 + (aspersor.isConectado() ? "CONECTADO" : "DESCONECTADO"));
     }
-    // Eliminar aspersor completamente
     public void eliminarAspersor(Scanner scanner) {
 
-        System.out.println("\n=== ELIMINAR ASPERSOR ===");
+        System.out.println("\n----- ELIMINAR ASPERSOR -----");
 
         for (Aspersor a : gestorGranja.getAspersoresInventario()) {
             System.out.println(a.getId());

@@ -2,17 +2,14 @@ package granjaautomatizada.modelo;
 
 import java.util.ArrayList;
 
-// Representa un sensor de humedad
 public class SensorHumedad {
 
     private String id;
     private boolean conectado;
     private int humedadActual = 50; // valor inicial
 
-    // Parcela donde está instalado
     private Parcela parcela;
 
-    // Historial de lecturas
     private ArrayList<LecturaHumedad> lecturas;
 
     public SensorHumedad(String id) {
@@ -48,10 +45,9 @@ public class SensorHumedad {
     public LecturaHumedad leerHumedad() {
 
         if (!conectado) {
-            return null; // sensor desconectado no puede leer
+            return null;
         }
 
-        // Generar humedad progresiva
         humedadActual = granjaautomatizada.utilitario.Util.generarHumedadProgresiva(humedadActual);
 
         LecturaHumedad lectura = new LecturaHumedad(

@@ -1,6 +1,5 @@
 package granjaautomatizada.modelo;
 
-// Representa un cultivo sembrado en una parcela
 public class Cultivo {
 
     private String nombre;

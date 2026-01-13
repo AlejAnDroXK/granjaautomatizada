@@ -4,17 +4,14 @@ package granjaautomatizada.modelo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-// Representa un aspersor de riego
 public class Aspersor {
 
     private String id;
     private boolean conectado;
     private boolean encendido;
 
-    // Parcela donde está instalado (asociación)
     private Parcela parcela;
 
-    // Historial de encendidos
     private ArrayList<LocalDateTime> historialEncendidos;
 
     public Aspersor(String id) {
@@ -48,7 +45,6 @@ public class Aspersor {
         this.parcela = parcela;
     }
 
-    // Enciende el aspersor si está conectado
     public void encender() {
         if (conectado) {
             this.encendido = true;

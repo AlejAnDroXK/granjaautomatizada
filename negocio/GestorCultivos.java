@@ -2,17 +2,15 @@ package granjaautomatizada.negocio;
 
 import granjaautomatizada.modelo.Cultivo;
 import granjaautomatizada.modelo.Parcela;
+import granjaautomatizada.utilitario.GranjaException;
 import granjaautomatizada.utilitario.Util;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// Clase encargada de toda la lógica de cultivos
 public class GestorCultivos {
 
     private GestorGranja gestorGranja;
-
-    // Lista general de cultivos (para opción 9 del menú)
     private ArrayList<Cultivo> cultivosRegistrados;
 
     public GestorCultivos(GestorGranja gestorGranja) {
@@ -20,17 +18,14 @@ public class GestorCultivos {
         this.cultivosRegistrados = new ArrayList<>();
     }
 
-    // Registrar cultivos para todas las parcelas
     public void registrarCultivosEnParcelas(Scanner scanner) {
 
-        System.out.println("\n=== REGISTRO DE CULTIVOS ===");
+        System.out.println("\n----- REGISTRO DE CULTIVOS -----");
 
         for (Parcela parcela : gestorGranja.getParcelas()) {
 
             System.out.println("\nParcela: " + parcela.getId()
                     + " (" + parcela.getMetrosCuadrados() + " m²)");
-
-            //Validacion
             int opcion;
             do {
                 opcion = Util.leerEntero(scanner, "¿Desea sembrar un cultivo aquí? (1=Sí / 0=No): ");
@@ -57,10 +52,7 @@ public class GestorCultivos {
                         frecuencia
                 );
 
-                // Asociamos cultivo a la parcela
                 parcela.setCultivo(cultivo);
-
-                // Guardamos cultivo en la lista general
                 cultivosRegistrados.add(cultivo);
 
                 System.out.println(" Cultivo " + nombre
@@ -72,10 +64,9 @@ public class GestorCultivos {
         }
     }
 
-    // Muestra todos los cultivos disponibles en el sistema
     public void mostrarCultivosDisponibles() {
 
-        System.out.println("\n=== LISTA DE CULTIVOS DISPONIBLES ===");
+        System.out.println("\n----- LISTA DE CULTIVOS DISPONIBLES -----");
 
         boolean hayCultivos = false;
 
@@ -97,10 +88,9 @@ public class GestorCultivos {
             System.out.println("No hay cultivos registrados.");
         }
     }
-    // Cambia el cultivo de una parcela
-    public void cambiarCultivoParcela(Scanner scanner) {
+    public void cambiarCultivoParcela(Scanner scanner) throws GranjaException {
 
-        System.out.println("\n=== CAMBIAR CULTIVO DE PARCELA ===");
+        System.out.println("\n----- CAMBIAR CULTIVO DE PARCELA -----");
 
         boolean hayParcelasConCultivo = false;
 
@@ -120,7 +110,7 @@ public class GestorCultivos {
 
         System.out.print("\nIngrese el ID de la parcela: ");
         String id = scanner.next();
-        scanner.nextLine(); // limpiar buffer
+        scanner.nextLine();
 
         Parcela parcelaSeleccionada = null;
 
@@ -131,12 +121,13 @@ public class GestorCultivos {
             }
         }
 
-        if (parcelaSeleccionada == null || parcelaSeleccionada.getCultivo() == null) {
-            System.out.println(" Parcela inválida o sin cultivo.");
-            return;
+        if (parcelaSeleccionada == null) {
+            throw new GranjaException("La parcela ingresada no existe.");
+        }
+        if (parcelaSeleccionada.getCultivo() == null) {
+            throw new GranjaException("Esta parcela NO tiene un cultivo registrado. Use la opción de 'Registrar' primero.");
         }
 
-        // Eliminamos cultivo anterior
         parcelaSeleccionada.setCultivo(null);
 
         System.out.println("Ingrese los datos del nuevo cultivo:");
