@@ -140,9 +140,9 @@ public class Main {
                 }
 
             } catch (GranjaException ge) {
-                System.out.println("\n⚠ AVISO: " + ge.getMessage());
+                System.out.println("\nAVISO: " + ge.getMessage());
             } catch (Exception e) {
-                System.out.println("\n☠️ ERROR CRÍTICO: " + e.getMessage());
+                System.out.println("\nERROR CRÍTICO: " + e.getMessage());
                 e.printStackTrace();
                 opcion = 0;
             }

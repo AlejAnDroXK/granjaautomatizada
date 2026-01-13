@@ -9,7 +9,7 @@ Hacer en Java-con una interfaz grafica
 PAQUETE interfaz
 Con la responsabilidad de mostrar los menús al usuario, leer los datos proporcionados por este y llamar a los métodos de negocio correspondientes para procesar la información.
 	*Clase Main
-	Contiene el método main(String[] args), que se encarga de mostrar el menú principal con opciones del 1 al 20. No realiza cálculos ni guarda listas, sino que coordina las interacciones del usuario, llamando a los métodos adecuados según las opciones seleccionadas.
+	Contiene el metodo main(String[] args), que se encarga de mostrar el menú principal con opciones del 1 al 20. No realiza cálculos ni guarda listas, sino que coordina las interacciones del usuario, llamando a los métodos adecuados según las opciones seleccionadas.
 PAQUETE utilitario
 Clases de apoyo reutilizables
 	*Clase Util
