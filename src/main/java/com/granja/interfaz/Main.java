@@ -1,25 +1,61 @@
 package com.granja.interfaz;
 
 import com.granja.negocio.*;
+import com.granja.servicio.PersistenciaService;
 import com.granja.utilitario.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import java.util.List;
+import java.util.Scanner;
 
-public class Main {
-    private static GestorGranja gestorGranja;
+@SpringBootApplication
+@ComponentScan(basePackages = "com.granja")
+@EntityScan(basePackages = "com.granja.entidad")
+@EnableJpaRepositories(basePackages = "com.granja.repositorio")
+public class Main implements CommandLineRunner {
+
+    @Autowired
+    private GestorGranja gestorGranja;
+
+    @Autowired
+    private PersistenciaService persistenciaService;
+
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        gestorGranja = new GestorGranja();
-        inicializarSistema();
-        ejecutarMenuPrincipal();
+        System.setProperty("java.awt.headless", "false");
+        SpringApplication app = new SpringApplication(Main.class);
+        app.setHeadless(false);
+        app.run(args);
     }
 
-    private static void inicializarSistema() {
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("\n========== INICIANDO SISTEMA DE CONSOLA ==========");
+        System.out.println("¿Desea ejecutar el modo consola? (s/n)");
+        String respuesta = scanner.nextLine().trim().toLowerCase();
+
+        if (respuesta.equals("s") || respuesta.equals("si")) {
+            inicializarSistema();
+            ejecutarMenuPrincipal();
+        } else {
+            System.out.println("Ejecutando solo interfaz web Vaadin en http://localhost:8080");
+        }
+    }
+
+    private void inicializarSistema() {
+        gestorGranja.setPersistenciaService(persistenciaService);
         gestorGranja.getGestorAspersores().agregarAspersoresInventario(10);
         gestorGranja.getGestorSensores().agregarSensoresInventario(10);
         System.out.println("Sistema inicializado con 10 aspersores y 10 sensores en inventario.");
     }
 
-    private static void ejecutarMenuPrincipal() {
+    private void ejecutarMenuPrincipal() {
         boolean continuar = true;
 
         while (continuar) {
@@ -115,6 +151,7 @@ public class Main {
                         gestorGranja.getGestorArduino().desconectarTodos();
                         System.out.println("Saliendo del sistema...");
                         continuar = false;
+                        System.exit(0);
                         break;
                     default:
                         System.out.println("Opción inválida. Intente nuevamente.");
@@ -128,89 +165,91 @@ public class Main {
         }
     }
 
-    private static void opcionAnadirTerreno() throws GranjaException {
+    private void opcionAnadirTerreno() throws GranjaException {
         double terreno = Util.leerDouble("Ingrese el total de terreno en m²: ");
         gestorGranja.getGestorParcelas().crearParcelas(terreno);
     }
 
-    private static void opcionAsignarAspersor() throws GranjaException {
+    private void opcionAsignarAspersor() throws GranjaException {
         String idParcela = Util.leerCadena("Ingrese el ID de la parcela: ");
         gestorGranja.getGestorAspersores().asignarAspersorAParcela(idParcela);
     }
 
-    private static void opcionAsignarSensor() throws GranjaException {
+    private void opcionAsignarSensor() throws GranjaException {
         String idParcela = Util.leerCadena("Ingrese el ID de la parcela: ");
         gestorGranja.getGestorSensores().asignarSensorAParcela(idParcela);
     }
 
-    private static void opcionAgregarAspersores() {
+    private void opcionAgregarAspersores() {
         int cantidad = Util.leerEnteroPositivo("¿Cuántos aspersores desea agregar? ");
         gestorGranja.getGestorAspersores().agregarAspersoresInventario(cantidad);
     }
 
-    private static void opcionAgregarSensores() {
+    private void opcionAgregarSensores() {
         int cantidad = Util.leerEnteroPositivo("¿Cuántos sensores desea agregar? ");
         gestorGranja.getGestorSensores().agregarSensoresInventario(cantidad);
     }
 
-    private static void opcionRegistrarCultivo() throws GranjaException {
+    private void opcionRegistrarCultivo() throws GranjaException {
         String idParcela = Util.leerCadena("Ingrese el ID de la parcela: ");
-        int indiceCultivo = Util.leerEntero("Seleccione el número del cultivo: ");
-        gestorGranja.getGestorCultivos().registrarCultivoEnParcela(idParcela, indiceCultivo);
+        gestorGranja.getGestorCultivos().mostrarCultivosDisponibles();
+        String nombreCultivo = Util.leerCadena("Ingrese el nombre del cultivo: ");
+        gestorGranja.getGestorCultivos().registrarCultivoEnParcela(idParcela, nombreCultivo);
     }
 
-    private static void opcionEliminarParcela() throws GranjaException {
+    private void opcionEliminarParcela() throws GranjaException {
         String idParcela = Util.leerCadena("Ingrese el ID de la parcela a eliminar: ");
         gestorGranja.getGestorParcelas().eliminarParcela(idParcela);
     }
 
-    private static void opcionCambiarCultivo() throws GranjaException {
+    private void opcionCambiarCultivo() throws GranjaException {
         String idParcela = Util.leerCadena("Ingrese el ID de la parcela: ");
-        gestorGranja.getGestorCultivos().cambiarCultivoParcela(idParcela);
+        gestorGranja.getGestorCultivos().mostrarCultivosDisponibles();
+        String nombreCultivo = Util.leerCadena("Ingrese el nombre del cultivo: ");
+        gestorGranja.getGestorCultivos().cambiarCultivoParcela(idParcela, nombreCultivo);
     }
 
-    private static void opcionRiegoAutomatico() {
+    private void opcionRiegoAutomatico() {
         gestorGranja.getGestorSensores().simularLecturasTodasParcelas();
-        gestorGranja.getGestorSensores().mostrarHumedadActualParcelas();
         gestorGranja.getGestorAspersores().realizarRiegoAutomatico();
     }
 
-    private static void opcionMostrarLecturasSensor() throws GranjaException {
+    private void opcionMostrarLecturasSensor() throws GranjaException {
         String idSensor = Util.leerCadena("Ingrese el ID del sensor: ");
         gestorGranja.getGestorSensores().mostrarLecturasSensor(idSensor);
     }
 
-    private static void opcionMostrarHistorialAspersor() throws GranjaException {
+    private void opcionMostrarHistorialAspersor() throws GranjaException {
         String idAspersor = Util.leerCadena("Ingrese el ID del aspersor: ");
         gestorGranja.getGestorAspersores().mostrarHistorialAspersor(idAspersor);
     }
 
-    private static void opcionPrenderAspersor() throws GranjaException {
+    private void opcionPrenderAspersor() throws GranjaException {
         String idAspersor = Util.leerCadena("Ingrese el ID del aspersor: ");
         gestorGranja.getGestorAspersores().prenderManualmente(idAspersor);
     }
 
-    private static void opcionConectarDesconectarAspersor() throws GranjaException {
+    private void opcionConectarDesconectarAspersor() throws GranjaException {
         String idAspersor = Util.leerCadena("Ingrese el ID del aspersor: ");
         gestorGranja.getGestorAspersores().conectarDesconectarAspersor(idAspersor);
     }
 
-    private static void opcionConectarDesconectarSensor() throws GranjaException {
+    private void opcionConectarDesconectarSensor() throws GranjaException {
         String idSensor = Util.leerCadena("Ingrese el ID del sensor: ");
         gestorGranja.getGestorSensores().conectarDesconectarSensor(idSensor);
     }
 
-    private static void opcionEliminarAspersor() throws GranjaException {
+    private void opcionEliminarAspersor() throws GranjaException {
         String idAspersor = Util.leerCadena("Ingrese el ID del aspersor: ");
         gestorGranja.getGestorAspersores().eliminarAspersor(idAspersor);
     }
 
-    private static void opcionEliminarSensor() throws GranjaException {
+    private void opcionEliminarSensor() throws GranjaException {
         String idSensor = Util.leerCadena("Ingrese el ID del sensor: ");
         gestorGranja.getGestorSensores().eliminarSensor(idSensor);
     }
 
-    private static void opcionEscanearArduinos() {
+    private void opcionEscanearArduinos() {
         System.out.println("\n========== ESCANEO DE PUERTOS USB ==========");
         List<String> puertos = gestorGranja.getGestorArduino().escanearPuertosUSB();
         if (puertos.isEmpty()) {
@@ -218,7 +257,7 @@ public class Main {
         }
     }
 
-    private static void opcionRegistrarSensorArduino() {
+    private void opcionRegistrarSensorArduino() {
         String puerto = Util.leerCadena("Ingrese el puerto USB (ej: COM3, /dev/ttyUSB0): ");
         boolean exito = gestorGranja.getGestorArduino().registrarSensorDesdeArduino(puerto);
         if (exito) {
@@ -228,7 +267,7 @@ public class Main {
         }
     }
 
-    private static void opcionRegistrarAspersorArduino() {
+    private void opcionRegistrarAspersorArduino() {
         String puerto = Util.leerCadena("Ingrese el puerto USB (ej: COM3, /dev/ttyUSB0): ");
         boolean exito = gestorGranja.getGestorArduino().registrarAspersorDesdeArduino(puerto);
         if (exito) {
@@ -238,7 +277,7 @@ public class Main {
         }
     }
 
-    private static void opcionMostrarDispositivosArduino() {
+    private void opcionMostrarDispositivosArduino() {
         System.out.println("\n========== DISPOSITIVOS ARDUINO CONECTADOS ==========");
         List<String> dispositivos = gestorGranja.getGestorArduino().obtenerDispositivosConectados();
         if (dispositivos.isEmpty()) {
@@ -250,13 +289,13 @@ public class Main {
         }
     }
 
-    private static void opcionSeleccionarUsuario() throws GranjaException {
+    private void opcionSeleccionarUsuario() throws GranjaException {
         gestorGranja.getGestorUsuarios().mostrarUsuarios();
         String idUsuario = Util.leerCadena("\nIngrese el ID del usuario: ");
         gestorGranja.getGestorUsuarios().seleccionarUsuarioActual(idUsuario);
     }
 
-    private static void opcionAgregarUsuario() {
+    private void opcionAgregarUsuario() {
         System.out.println("\n========== REGISTRAR NUEVO USUARIO ==========");
         String nombre = Util.leerCadena("Nombre: ");
         String apellido = Util.leerCadena("Apellido: ");

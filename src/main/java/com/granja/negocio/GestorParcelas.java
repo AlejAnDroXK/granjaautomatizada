@@ -1,15 +1,21 @@
 package com.granja.negocio;
 
 import com.granja.modelo.*;
+import com.granja.servicio.PersistenciaService;
 import com.granja.utilitario.*;
 
 public class GestorParcelas {
     private GestorGranja gestorGranja;
     private int contadorParcelas;
+    private PersistenciaService persistenciaService;
 
     public GestorParcelas(GestorGranja gestorGranja) {
         this.gestorGranja = gestorGranja;
         this.contadorParcelas = 1;
+    }
+
+    public void setPersistenciaService(PersistenciaService persistenciaService) {
+        this.persistenciaService = persistenciaService;
     }
 
     public void crearParcelas(double terrenoTotal) throws GranjaException {
@@ -31,6 +37,15 @@ public class GestorParcelas {
             Parcela parcela = new Parcela(idParcela, tamañoParcela);
             parcela.setUsuarioCreador(usuarioActual);
             gestorGranja.getParcelas().add(parcela);
+
+            if (persistenciaService != null) {
+                try {
+                    persistenciaService.guardarParcela(parcela, usuarioActual);
+                } catch (Exception e) {
+                    System.out.println("Error guardando parcela en BD: " + e.getMessage());
+                }
+            }
+
             contadorParcelas++;
         }
 
@@ -39,6 +54,15 @@ public class GestorParcelas {
             Parcela parcela = new Parcela(idParcela, terrenoRestante);
             parcela.setUsuarioCreador(usuarioActual);
             gestorGranja.getParcelas().add(parcela);
+
+            if (persistenciaService != null) {
+                try {
+                    persistenciaService.guardarParcela(parcela, usuarioActual);
+                } catch (Exception e) {
+                    System.out.println("Error guardando parcela en BD: " + e.getMessage());
+                }
+            }
+
             contadorParcelas++;
         }
 
@@ -49,31 +73,31 @@ public class GestorParcelas {
 
     private void asignarDispositivosAutomaticamente() {
         for (Parcela parcela : gestorGranja.getParcelas()) {
-            if (!gestorGranja.getAspersoresInventario().isEmpty()) {
+            if (parcela.getAspersores().isEmpty() && !gestorGranja.getAspersoresInventario().isEmpty()) {
                 Aspersor aspersor = gestorGranja.getAspersoresInventario().get(0);
                 aspersor.setParcela(parcela);
-                aspersor.setConectado(true);
                 parcela.agregarAspersor(aspersor);
                 gestorGranja.getAspersoresInventario().remove(aspersor);
+                System.out.println("Aspersor " + aspersor.getId() + " asignado a " + parcela.getId());
             }
 
-            if (!gestorGranja.getSensoresInventario().isEmpty()) {
+            if (parcela.getSensores().isEmpty() && !gestorGranja.getSensoresInventario().isEmpty()) {
                 SensorHumedad sensor = gestorGranja.getSensoresInventario().get(0);
                 sensor.setParcela(parcela);
-                sensor.setConectado(true);
                 parcela.agregarSensor(sensor);
                 gestorGranja.getSensoresInventario().remove(sensor);
+                System.out.println("Sensor " + sensor.getId() + " asignado a " + parcela.getId());
             }
         }
     }
 
     public void mostrarInformacionParcelas() {
+        System.out.println("\n========== INFORMACIÓN DE PARCELAS ==========");
         if (gestorGranja.getParcelas().isEmpty()) {
-            System.out.println("No hay parcelas registradas en el sistema.");
+            System.out.println("No hay parcelas creadas.");
             return;
         }
 
-        System.out.println("\n========== INFORMACIÓN DE PARCELAS ==========");
         for (Parcela parcela : gestorGranja.getParcelas()) {
             System.out.println(parcela);
         }
@@ -86,25 +110,26 @@ public class GestorParcelas {
             throw new GranjaException("Parcela no encontrada: " + idParcela);
         }
 
-        if (!Util.confirmarAccion("¿Está seguro de eliminar la parcela " + idParcela + "?")) {
-            System.out.println("Operación cancelada.");
-            return;
-        }
-
         for (Aspersor aspersor : parcela.getAspersores()) {
             aspersor.setParcela(null);
-            aspersor.setConectado(false);
-            aspersor.setEncendido(false);
             gestorGranja.getAspersoresInventario().add(aspersor);
         }
 
         for (SensorHumedad sensor : parcela.getSensores()) {
             sensor.setParcela(null);
-            sensor.setConectado(false);
             gestorGranja.getSensoresInventario().add(sensor);
         }
 
         gestorGranja.getParcelas().remove(parcela);
+
+        if (persistenciaService != null) {
+            try {
+                persistenciaService.eliminarParcela(idParcela);
+            } catch (Exception e) {
+                System.out.println("Error eliminando parcela de BD: " + e.getMessage());
+            }
+        }
+
         System.out.println("Parcela " + idParcela + " eliminada exitosamente.");
     }
 

@@ -2,8 +2,12 @@ package com.granja.negocio;
 
 import com.granja.modelo.*;
 import com.granja.hardware.GestorArduino;
+import com.granja.servicio.PersistenciaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
+@Component
 public class GestorGranja {
     private ArrayList<Parcela> parcelas;
     private ArrayList<Aspersor> aspersoresInventario;
@@ -16,6 +20,7 @@ public class GestorGranja {
     private GestorUsuarios gestorUsuarios;
     private int contadorIdAspersores;
     private int contadorIdSensores;
+    private PersistenciaService persistenciaService;
 
     public GestorGranja() {
         this.parcelas = new ArrayList<>();
@@ -30,6 +35,22 @@ public class GestorGranja {
         this.gestorSensores = new GestorSensores(this);
         this.gestorCultivos = new GestorCultivos(this);
         this.gestorArduino = new GestorArduino(this);
+    }
+
+    @Autowired(required = false)
+    public void setPersistenciaService(PersistenciaService persistenciaService) {
+        this.persistenciaService = persistenciaService;
+        if (persistenciaService != null) {
+            gestorUsuarios.setPersistenciaService(persistenciaService);
+            gestorParcelas.setPersistenciaService(persistenciaService);
+            gestorAspersores.setPersistenciaService(persistenciaService);
+            gestorSensores.setPersistenciaService(persistenciaService);
+            gestorCultivos.setPersistenciaService(persistenciaService);
+        }
+    }
+
+    public PersistenciaService getPersistenciaService() {
+        return persistenciaService;
     }
 
     public ArrayList<Parcela> getParcelas() {
@@ -80,31 +101,27 @@ public class GestorGranja {
         return gestorUsuarios;
     }
 
+    public String getSiguienteIdAspersor() {
+        return "ASPERSOR_" + (contadorIdAspersores++);
+    }
+
+    public String getSiguienteIdSensor() {
+        return "SENSOR_" + (contadorIdSensores++);
+    }
+
     public int getContadorIdAspersores() {
         return contadorIdAspersores;
     }
 
-    public void setContadorIdAspersores(int contadorIdAspersores) {
-        this.contadorIdAspersores = contadorIdAspersores;
+    public void incrementarContadorAspersores() {
+        contadorIdAspersores++;
     }
 
     public int getContadorIdSensores() {
         return contadorIdSensores;
     }
 
-    public void setContadorIdSensores(int contadorIdSensores) {
-        this.contadorIdSensores = contadorIdSensores;
-    }
-
-    public String getSiguienteIdAspersor() {
-        String id = "ASPERSOR_" + contadorIdAspersores;
-        contadorIdAspersores++;
-        return id;
-    }
-
-    public String getSiguienteIdSensor() {
-        String id = "SENSOR_" + contadorIdSensores;
+    public void incrementarContadorSensores() {
         contadorIdSensores++;
-        return id;
     }
 }

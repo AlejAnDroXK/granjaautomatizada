@@ -1,11 +1,11 @@
 package com.granja.interfaz;
 
-import com.github.javaparser.utils.Log;
 import com.granja.controlador.GranjaController;
 import com.granja.modelo.*;
 import com.granja.utilitario.GranjaException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
@@ -19,14 +19,17 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("")
 public class MainView extends VerticalLayout {
-    private GranjaController controller;
+    private final GranjaController controller;
     private VerticalLayout contentLayout;
+    private HorizontalLayout userBar;
 
-    public MainView() {
-        controller = new GranjaController();
+    @Autowired
+    public MainView(GranjaController controller) {
+        this.controller = controller;
 
         setSizeFull();
         setPadding(true);
@@ -35,7 +38,7 @@ public class MainView extends VerticalLayout {
         H1 title = new H1("Sistema de Riego Automatizado");
         title.getStyle().set("color", "#2e7d32");
 
-        HorizontalLayout userBar = createUserBar();
+        userBar = createUserBar();
         Tabs tabs = createTabs();
         contentLayout = new VerticalLayout();
         contentLayout.setSizeFull();
@@ -46,13 +49,13 @@ public class MainView extends VerticalLayout {
     }
 
     private HorizontalLayout createUserBar() {
-        HorizontalLayout userBar = new HorizontalLayout();
-        userBar.setWidthFull();
-        userBar.getStyle().set("background-color", "#f5f5f5");
-        userBar.getStyle().set("padding", "10px");
-        userBar.getStyle().set("border-radius", "5px");
-        userBar.setAlignItems(Alignment.CENTER);
-        userBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        HorizontalLayout userBarLayout = new HorizontalLayout();
+        userBarLayout.setWidthFull();
+        userBarLayout.getStyle().set("background-color", "#f5f5f5");
+        userBarLayout.getStyle().set("padding", "10px");
+        userBarLayout.getStyle().set("border-radius", "5px");
+        userBarLayout.setAlignItems(Alignment.CENTER);
+        userBarLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         HorizontalLayout userInfo = new HorizontalLayout();
         userInfo.setAlignItems(Alignment.CENTER);
@@ -68,9 +71,15 @@ public class MainView extends VerticalLayout {
         Button cambiarUsuarioBtn = new Button("Cambiar Usuario", e -> mostrarVistaUsuarios());
 
         userInfo.add(userLabel);
-        userBar.add(userInfo, cambiarUsuarioBtn);
+        userBarLayout.add(userInfo, cambiarUsuarioBtn);
 
-        return userBar;
+        return userBarLayout;
+    }
+
+    private void actualizarBarraUsuario() {
+        remove(userBar);
+        userBar = createUserBar();
+        addComponentAtIndex(1, userBar);
     }
 
     private Tabs createTabs() {
@@ -123,7 +132,8 @@ public class MainView extends VerticalLayout {
             Button cerrarSesionBtn = new Button("Cerrar Sesión", e -> {
                 controller.cerrarSesionUsuario();
                 mostrarNotificacion("Sesión cerrada", NotificationVariant.LUMO_SUCCESS);
-                getUI().ifPresent(ui -> ui.getPage().reload());
+                actualizarBarraUsuario();
+                actualizarVistaUsuarios();
             });
             cerrarSesionBtn.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
@@ -172,9 +182,9 @@ public class MainView extends VerticalLayout {
                 try {
                     controller.seleccionarUsuarioActual(usuario.getId());
                     mostrarNotificacion("Usuario seleccionado: " + usuario.getNombreCompleto(), NotificationVariant.LUMO_SUCCESS);
-                   // getUI().ifPresent(ui -> ui.getPage().reload());
+                    actualizarBarraUsuario();
+                    actualizarVistaUsuarios();
                 } catch (GranjaException ex) {
-                    Log.error("error"+ ex.getMessage());
                     mostrarNotificacion("Error: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
                 }
             });
@@ -408,22 +418,25 @@ public class MainView extends VerticalLayout {
         gridCultivos.setItems(controller.obtenerCultivosDisponibles());
 
         TextField parcelaField = new TextField("ID Parcela");
-        NumberField cultivoIndexField = new NumberField("Número de Cultivo");
-        cultivoIndexField.setMin(1);
-        cultivoIndexField.setMax(controller.obtenerCultivosDisponibles().size());
+
+        ComboBox<Cultivo> cultivoCombo = new ComboBox<>("Cultivo");
+        cultivoCombo.setItems(controller.obtenerCultivosDisponibles());
+        cultivoCombo.setItemLabelGenerator(Cultivo::getNombre);
 
         Button asignarButton = new Button("Asignar Cultivo a Parcela", e -> {
             try {
-                controller.registrarCultivoEnParcela(parcelaField.getValue(),
-                        cultivoIndexField.getValue().intValue());
-                mostrarNotificacion("Cultivo asignado", NotificationVariant.LUMO_SUCCESS);
+                if (cultivoCombo.getValue() != null) {
+                    controller.registrarCultivoEnParcela(parcelaField.getValue(), cultivoCombo.getValue().getNombre());
+                    mostrarNotificacion("Cultivo asignado", NotificationVariant.LUMO_SUCCESS);
+                    actualizarGridParcelas();
+                }
             } catch (GranjaException ex) {
                 mostrarNotificacion("Error: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
             }
         });
         asignarButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        HorizontalLayout formLayout = new HorizontalLayout(parcelaField, cultivoIndexField, asignarButton);
+        HorizontalLayout formLayout = new HorizontalLayout(parcelaField, cultivoCombo, asignarButton);
         formLayout.setAlignItems(Alignment.BASELINE);
 
         contentLayout.add(subtitle, new H2("Cultivos Disponibles"), gridCultivos,

@@ -1,14 +1,21 @@
 package com.granja.negocio;
 
 import com.granja.modelo.*;
+import com.granja.servicio.PersistenciaService;
 import com.granja.utilitario.*;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GestorSensores {
     private GestorGranja gestorGranja;
+    private PersistenciaService persistenciaService;
 
     public GestorSensores(GestorGranja gestorGranja) {
         this.gestorGranja = gestorGranja;
+    }
+
+    public void setPersistenciaService(PersistenciaService persistenciaService) {
+        this.persistenciaService = persistenciaService;
     }
 
     public void agregarSensoresInventario(int cantidad) {
@@ -16,6 +23,14 @@ public class GestorSensores {
             String id = gestorGranja.getSiguienteIdSensor();
             SensorHumedad sensor = new SensorHumedad(id);
             gestorGranja.getSensoresInventario().add(sensor);
+
+            if (persistenciaService != null) {
+                try {
+                    persistenciaService.guardarSensor(sensor);
+                } catch (Exception e) {
+                    System.out.println("Error guardando sensor en BD: " + e.getMessage());
+                }
+            }
         }
         System.out.println("Se agregaron " + cantidad + " sensor(es) al inventario.");
     }
@@ -56,11 +71,39 @@ public class GestorSensores {
 
         SensorHumedad sensor = gestorGranja.getSensoresInventario().get(0);
         sensor.setParcela(parcela);
-        sensor.setConectado(true);
         parcela.agregarSensor(sensor);
         gestorGranja.getSensoresInventario().remove(sensor);
 
-        System.out.println("Sensor " + sensor.getId() + " asignado a " + idParcela);
+        if (persistenciaService != null) {
+            try {
+                persistenciaService.guardarSensor(sensor);
+            } catch (Exception e) {
+                System.out.println("Error actualizando sensor en BD: " + e.getMessage());
+            }
+        }
+
+        System.out.println("Sensor " + sensor.getId() + " asignado a parcela " + idParcela);
+    }
+
+    public void conectarDesconectarSensor(String idSensor) throws GranjaException {
+        SensorHumedad sensor = buscarSensor(idSensor);
+
+        if (sensor == null) {
+            throw new GranjaException("Sensor no encontrado: " + idSensor);
+        }
+
+        sensor.setConectado(!sensor.isConectado());
+
+        if (persistenciaService != null) {
+            try {
+                persistenciaService.guardarSensor(sensor);
+            } catch (Exception e) {
+                System.out.println("Error actualizando sensor en BD: " + e.getMessage());
+            }
+        }
+
+        String estado = sensor.isConectado() ? "conectado" : "desconectado";
+        System.out.println("Sensor " + idSensor + " " + estado);
     }
 
     public void simularLecturasTodasParcelas() {
@@ -90,6 +133,17 @@ public class GestorSensores {
 
                     sensor.setHumedadActual(nuevaHumedad);
                     sensor.realizarLectura();
+
+                    if (persistenciaService != null) {
+                        try {
+                            persistenciaService.guardarSensor(sensor);
+                            LecturaHumedad ultimaLectura = sensor.getLecturas().get(sensor.getLecturas().size() - 1);
+                            persistenciaService.guardarLecturaHumedad(sensor.getId(), ultimaLectura);
+                        } catch (Exception e) {
+                            System.out.println("Error guardando lectura en BD: " + e.getMessage());
+                        }
+                    }
+
                     hayLecturas = true;
                 }
             }
@@ -107,53 +161,15 @@ public class GestorSensores {
             throw new GranjaException("Sensor no encontrado: " + idSensor);
         }
 
-        System.out.println("\n========== LECTURAS DE " + idSensor + " ==========");
+        System.out.println("\n========== LECTURAS DEL SENSOR " + idSensor + " ==========");
         if (sensor.getLecturas().isEmpty()) {
             System.out.println("No hay lecturas registradas.");
         } else {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             for (LecturaHumedad lectura : sensor.getLecturas()) {
-                System.out.println(lectura.getFecha().format(formatter) +
-                        " - Humedad: " + lectura.getPorcentajeHumedad() + "%");
+                System.out.println(lectura.getFecha().format(formatter) + " - " +
+                        lectura.getPorcentajeHumedad() + "%");
             }
-        }
-    }
-
-    public void mostrarHumedadActualParcelas() {
-        System.out.println("\n========== HUMEDAD ACTUAL DE PARCELAS ==========");
-        boolean hayDatos = false;
-
-        for (Parcela parcela : gestorGranja.getParcelas()) {
-            if (!parcela.getSensores().isEmpty()) {
-                SensorHumedad sensor = parcela.getSensores().get(0);
-                if (sensor.isConectado()) {
-                    String cultivoStr = (parcela.getCultivo() != null) ?
-                            parcela.getCultivo().getNombre() : "Sin cultivo";
-                    System.out.println(parcela.getId() + " - " + cultivoStr +
-                            " - Humedad: " + sensor.getHumedadActual() + "%");
-                    hayDatos = true;
-                }
-            }
-        }
-
-        if (!hayDatos) {
-            System.out.println("No hay sensores conectados en las parcelas.");
-        }
-    }
-
-    public void conectarDesconectarSensor(String idSensor) throws GranjaException {
-        SensorHumedad sensor = buscarSensor(idSensor);
-
-        if (sensor == null) {
-            throw new GranjaException("Sensor no encontrado: " + idSensor);
-        }
-
-        if (sensor.isConectado()) {
-            sensor.setConectado(false);
-            System.out.println("Sensor " + idSensor + " desconectado.");
-        } else {
-            sensor.setConectado(true);
-            System.out.println("Sensor " + idSensor + " conectado.");
         }
     }
 
@@ -164,27 +180,29 @@ public class GestorSensores {
             throw new GranjaException("Sensor no encontrado: " + idSensor);
         }
 
-        if (!Util.confirmarAccion("¿Está seguro de eliminar el sensor " + idSensor + "?")) {
-            System.out.println("Operación cancelada.");
-            return;
-        }
-
         if (sensor.getParcela() != null) {
             sensor.getParcela().removerSensor(sensor);
-        } else {
-            gestorGranja.getSensoresInventario().remove(sensor);
+        }
+
+        gestorGranja.getSensoresInventario().remove(sensor);
+
+        if (persistenciaService != null) {
+            try {
+                persistenciaService.eliminarSensor(idSensor);
+            } catch (Exception e) {
+                System.out.println("Error eliminando sensor de BD: " + e.getMessage());
+            }
         }
 
         System.out.println("Sensor " + idSensor + " eliminado del sistema.");
     }
 
-    private SensorHumedad buscarSensor(String idSensor) {
+    public SensorHumedad buscarSensor(String idSensor) {
         for (SensorHumedad sensor : gestorGranja.getSensoresInventario()) {
             if (sensor.getId().equals(idSensor)) {
                 return sensor;
             }
         }
-
         for (Parcela parcela : gestorGranja.getParcelas()) {
             for (SensorHumedad sensor : parcela.getSensores()) {
                 if (sensor.getId().equals(idSensor)) {
@@ -192,7 +210,6 @@ public class GestorSensores {
                 }
             }
         }
-
         return null;
     }
 }

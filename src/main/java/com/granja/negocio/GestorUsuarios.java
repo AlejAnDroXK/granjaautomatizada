@@ -1,6 +1,7 @@
 package com.granja.negocio;
 
 import com.granja.modelo.Usuario;
+import com.granja.servicio.PersistenciaService;
 import com.granja.utilitario.GranjaException;
 import java.util.ArrayList;
 
@@ -9,12 +10,38 @@ public class GestorUsuarios {
     private ArrayList<Usuario> usuarios;
     private Usuario usuarioActual;
     private int contadorUsuarios;
+    private PersistenciaService persistenciaService;
 
     public GestorUsuarios(GestorGranja gestorGranja) {
         this.gestorGranja = gestorGranja;
         this.usuarios = new ArrayList<>();
         this.usuarioActual = null;
         this.contadorUsuarios = 1;
+    }
+
+    public GestorUsuarios() {
+        this.usuarios = new ArrayList<>();
+        this.usuarioActual = null;
+        this.contadorUsuarios = 1;
+    }
+
+    public void setPersistenciaService(PersistenciaService persistenciaService) {
+        this.persistenciaService = persistenciaService;
+        cargarUsuariosDesdeDB();
+    }
+
+    private void cargarUsuariosDesdeDB() {
+        if (persistenciaService != null) {
+            try {
+                usuarios = (ArrayList<Usuario>) persistenciaService.cargarUsuarios();
+                if (!usuarios.isEmpty()) {
+                    contadorUsuarios = usuarios.size() + 1;
+                    return;
+                }
+            } catch (Exception e) {
+                System.out.println("Error cargando usuarios de BD: " + e.getMessage());
+            }
+        }
         inicializarUsuariosPorDefecto();
     }
 
@@ -29,6 +56,16 @@ public class GestorUsuarios {
         Usuario usuario = new Usuario(id, nombre, apellido, email, telefono, rol);
         usuarios.add(usuario);
         contadorUsuarios++;
+
+        if (persistenciaService != null) {
+            try {
+                persistenciaService.guardarUsuario(usuario);
+                System.out.println("Usuario guardado en BD: " + usuario.getNombreCompleto());
+            } catch (Exception e) {
+                System.out.println("Error guardando usuario en BD: " + e.getMessage());
+            }
+        }
+
         System.out.println("Usuario registrado: " + usuario.getNombreCompleto() + " (" + id + ")");
     }
 

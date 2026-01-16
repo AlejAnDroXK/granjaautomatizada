@@ -2,14 +2,22 @@ package com.granja.controlador;
 
 import com.granja.modelo.*;
 import com.granja.negocio.*;
+import com.granja.servicio.PersistenciaService;
 import com.granja.utilitario.GranjaException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
+@Component
 public class GranjaController {
-    private GestorGranja gestorGranja;
+    private final GestorGranja gestorGranja;
+    private final PersistenciaService persistenciaService;
 
-    public GranjaController() {
-        this.gestorGranja = new GestorGranja();
+    @Autowired
+    public GranjaController(GestorGranja gestorGranja, PersistenciaService persistenciaService) {
+        this.gestorGranja = gestorGranja;
+        this.persistenciaService = persistenciaService;
+        gestorGranja.setPersistenciaService(persistenciaService);
         inicializarSistema();
     }
 
@@ -91,15 +99,15 @@ public class GranjaController {
     }
 
     public ArrayList<Cultivo> obtenerCultivosDisponibles() {
-        return gestorGranja.getGestorCultivos().getCultivosRegistrados();
+        return gestorGranja.getGestorCultivos().getCultivosDisponibles();
     }
 
-    public void registrarCultivoEnParcela(String idParcela, int indiceCultivo) throws GranjaException {
-        gestorGranja.getGestorCultivos().registrarCultivoEnParcela(idParcela, indiceCultivo);
+    public void registrarCultivoEnParcela(String idParcela, String nombreCultivo) throws GranjaException {
+        gestorGranja.getGestorCultivos().registrarCultivoEnParcela(idParcela, nombreCultivo);
     }
 
-    public void cambiarCultivoParcela(String idParcela, int indiceCultivo) throws GranjaException {
-        gestorGranja.getGestorCultivos().registrarCultivoEnParcela(idParcela, indiceCultivo);
+    public void cambiarCultivoParcela(String idParcela, String nombreCultivo) throws GranjaException {
+        gestorGranja.getGestorCultivos().cambiarCultivoParcela(idParcela, nombreCultivo);
     }
 
     public void eliminarParcela(String idParcela) throws GranjaException {
