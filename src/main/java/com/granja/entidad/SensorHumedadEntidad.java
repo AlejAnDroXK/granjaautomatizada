@@ -3,8 +3,8 @@ package com.granja.entidad;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "aspersor")
-public class AspersorEntity {
+@Table(name = "sensor_humedad")
+public class SensorHumedadEntidad {
 
     @Id
     @Column(name = "id", length = 50)
@@ -13,20 +13,20 @@ public class AspersorEntity {
     @Column(name = "conectado")
     private boolean conectado;
 
-    @Column(name = "encendido")
-    private boolean encendido;
+    @Column(name = "humedad_actual")
+    private int humedadActual;
 
     @ManyToOne
     @JoinColumn(name = "parcela_id")
     private ParcelaEntity parcela;
 
-    public AspersorEntity() {
+    public SensorHumedadEntidad() {
     }
 
-    public AspersorEntity(String id) {
+    public SensorHumedadEntidad(String id) {
         this.id = id;
         this.conectado = false;
-        this.encendido = false;
+        this.humedadActual = 50;
     }
 
     public String getId() {
@@ -45,12 +45,12 @@ public class AspersorEntity {
         this.conectado = conectado;
     }
 
-    public boolean isEncendido() {
-        return encendido;
+    public int getHumedadActual() {
+        return humedadActual;
     }
 
-    public void setEncendido(boolean encendido) {
-        this.encendido = encendido;
+    public void setHumedadActual(int humedadActual) {
+        this.humedadActual = humedadActual;
     }
 
     public ParcelaEntity getParcela() {

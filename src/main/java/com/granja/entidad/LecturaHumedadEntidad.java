@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lectura_humedad")
-public class LecturaHumedadEntity {
+public class LecturaHumedadEntidad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +21,10 @@ public class LecturaHumedadEntity {
     @Column(name = "porcentaje_humedad", nullable = false)
     private int porcentajeHumedad;
 
-    public LecturaHumedadEntity() {
+    public LecturaHumedadEntidad() {
     }
 
-    public LecturaHumedadEntity(String sensorId, LocalDateTime fecha, int porcentajeHumedad) {
+    public LecturaHumedadEntidad(String sensorId, LocalDateTime fecha, int porcentajeHumedad) {
         this.sensorId = sensorId;
         this.fecha = fecha;
         this.porcentajeHumedad = porcentajeHumedad;

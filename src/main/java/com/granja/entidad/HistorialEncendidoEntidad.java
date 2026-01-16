@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "historial_encendido")
-public class HistorialEncendidoEntity {
+public class HistorialEncendidoEntidad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +18,10 @@ public class HistorialEncendidoEntity {
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
 
-    public HistorialEncendidoEntity() {
+    public HistorialEncendidoEntidad() {
     }
 
-    public HistorialEncendidoEntity(String aspersorId, LocalDateTime fecha) {
+    public HistorialEncendidoEntidad(String aspersorId, LocalDateTime fecha) {
         this.aspersorId = aspersorId;
         this.fecha = fecha;
     }

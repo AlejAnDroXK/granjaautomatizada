@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuario")
-public class UsuarioEntity {
+public class UsuarioEntidad {
 
     @Id
     @Column(name = "id", length = 50)
@@ -32,10 +32,10 @@ public class UsuarioEntity {
     @Column(name = "activo")
     private boolean activo;
 
-    public UsuarioEntity() {
+    public UsuarioEntidad() {
     }
 
-    public UsuarioEntity(String id, String nombre, String apellido, String email, String telefono, String rol) {
+    public UsuarioEntidad(String id, String nombre, String apellido, String email, String telefono, String rol) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;

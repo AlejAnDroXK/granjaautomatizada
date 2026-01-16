@@ -15,28 +15,28 @@ import java.util.Optional;
 public class PersistenciaService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioRepositorio usuarioRepositorio;
 
     @Autowired
-    private ParcelaRepository parcelaRepository;
+    private ParcelaRepositorio parcelaRepositorio;
 
     @Autowired
-    private AspersorRepository aspersorRepository;
+    private AspersorRepositorio aspersorRepositorio;
 
     @Autowired
-    private SensorHumedadRepository sensorRepository;
+    private SensorHumedadRepositorio sensorRepository;
 
     @Autowired
-    private CultivoRepository cultivoRepository;
+    private CultivoRepositorio cultivoRepositorio;
 
     @Autowired
-    private LecturaHumedadRepository lecturaRepository;
+    private LecturaHumedadRepositorio lecturaRepository;
 
     @Autowired
-    private HistorialEncendidoRepository historialRepository;
+    private HistorialEncendidoRepositorio historialRepository;
 
     public void guardarUsuario(Usuario usuario) {
-        UsuarioEntity entity = new UsuarioEntity(
+        UsuarioEntidad entity = new UsuarioEntidad(
                 usuario.getId(),
                 usuario.getNombre(),
                 usuario.getApellido(),
@@ -46,13 +46,13 @@ public class PersistenciaService {
         );
         entity.setFechaRegistro(usuario.getFechaRegistro());
         entity.setActivo(usuario.isActivo());
-        usuarioRepository.save(entity);
+        usuarioRepositorio.save(entity);
     }
 
     public List<Usuario> cargarUsuarios() {
-        List<UsuarioEntity> entities = usuarioRepository.findAll();
+        List<UsuarioEntidad> entities = usuarioRepositorio.findAll();
         List<Usuario> usuarios = new ArrayList<>();
-        for (UsuarioEntity entity : entities) {
+        for (UsuarioEntidad entity : entities) {
             Usuario usuario = new Usuario(
                     entity.getId(),
                     entity.getNombre(),
@@ -73,46 +73,46 @@ public class PersistenciaService {
         entity.setFechaCreacion(parcela.getFechaCreacion());
 
         if (usuario != null) {
-            Optional<UsuarioEntity> usuarioEntity = usuarioRepository.findById(usuario.getId());
+            Optional<UsuarioEntidad> usuarioEntity = usuarioRepositorio.findById(usuario.getId());
             usuarioEntity.ifPresent(entity::setUsuarioCreador);
         }
 
         if (parcela.getCultivo() != null) {
-            Optional<CultivoEntity> cultivoEntity = cultivoRepository.findByNombre(parcela.getCultivo().getNombre());
+            Optional<CultivoEntidad> cultivoEntity = cultivoRepositorio.findByNombre(parcela.getCultivo().getNombre());
             cultivoEntity.ifPresent(entity::setCultivo);
         }
 
-        parcelaRepository.save(entity);
+        parcelaRepositorio.save(entity);
     }
 
     public void eliminarParcela(String idParcela) {
-        parcelaRepository.deleteById(idParcela);
+        parcelaRepositorio.deleteById(idParcela);
     }
 
     public void guardarAspersor(Aspersor aspersor) {
-        AspersorEntity entity = new AspersorEntity(aspersor.getId());
+        AspersorEntidad entity = new AspersorEntidad(aspersor.getId());
         entity.setConectado(aspersor.isConectado());
         entity.setEncendido(aspersor.isEncendido());
 
         if (aspersor.getParcela() != null) {
-            Optional<ParcelaEntity> parcelaEntity = parcelaRepository.findById(aspersor.getParcela().getId());
+            Optional<ParcelaEntity> parcelaEntity = parcelaRepositorio.findById(aspersor.getParcela().getId());
             parcelaEntity.ifPresent(entity::setParcela);
         }
 
-        aspersorRepository.save(entity);
+        aspersorRepositorio.save(entity);
     }
 
     public void eliminarAspersor(String idAspersor) {
-        aspersorRepository.deleteById(idAspersor);
+        aspersorRepositorio.deleteById(idAspersor);
     }
 
     public void guardarSensor(SensorHumedad sensor) {
-        SensorHumedadEntity entity = new SensorHumedadEntity(sensor.getId());
+        SensorHumedadEntidad entity = new SensorHumedadEntidad(sensor.getId());
         entity.setConectado(sensor.isConectado());
         entity.setHumedadActual(sensor.getHumedadActual());
 
         if (sensor.getParcela() != null) {
-            Optional<ParcelaEntity> parcelaEntity = parcelaRepository.findById(sensor.getParcela().getId());
+            Optional<ParcelaEntity> parcelaEntity = parcelaRepositorio.findById(sensor.getParcela().getId());
             parcelaEntity.ifPresent(entity::setParcela);
         }
 
@@ -124,7 +124,7 @@ public class PersistenciaService {
     }
 
     public void guardarLecturaHumedad(String sensorId, LecturaHumedad lectura) {
-        LecturaHumedadEntity entity = new LecturaHumedadEntity(
+        LecturaHumedadEntidad entity = new LecturaHumedadEntidad(
                 sensorId,
                 lectura.getFecha(),
                 lectura.getPorcentajeHumedad()
@@ -133,30 +133,30 @@ public class PersistenciaService {
     }
 
     public void guardarHistorialEncendido(String aspersorId, java.time.LocalDateTime fecha) {
-        HistorialEncendidoEntity entity = new HistorialEncendidoEntity(aspersorId, fecha);
+        HistorialEncendidoEntidad entity = new HistorialEncendidoEntidad(aspersorId, fecha);
         historialRepository.save(entity);
     }
 
     public void inicializarCultivos() {
-        if (cultivoRepository.count() == 0) {
-            cultivoRepository.save(new CultivoEntity("Tomate", 50, 70, 72));
-            cultivoRepository.save(new CultivoEntity("Lechuga", 40, 60, 48));
-            cultivoRepository.save(new CultivoEntity("Maíz", 45, 65, 96));
-            cultivoRepository.save(new CultivoEntity("Zanahoria", 35, 55, 120));
-            cultivoRepository.save(new CultivoEntity("Fresa", 55, 75, 60));
-            cultivoRepository.save(new CultivoEntity("Pepino", 50, 70, 72));
-            cultivoRepository.save(new CultivoEntity("Cebolla", 30, 50, 144));
+        if (cultivoRepositorio.count() == 0) {
+            cultivoRepositorio.save(new CultivoEntidad("Tomate", 50, 70, 72));
+            cultivoRepositorio.save(new CultivoEntidad("Lechuga", 40, 60, 48));
+            cultivoRepositorio.save(new CultivoEntidad("Maíz", 45, 65, 96));
+            cultivoRepositorio.save(new CultivoEntidad("Zanahoria", 35, 55, 120));
+            cultivoRepositorio.save(new CultivoEntidad("Fresa", 55, 75, 60));
+            cultivoRepositorio.save(new CultivoEntidad("Pepino", 50, 70, 72));
+            cultivoRepositorio.save(new CultivoEntidad("Cebolla", 30, 50, 144));
         }
     }
 
     public void actualizarCultivoParcela(String idParcela, String nombreCultivo) {
-        Optional<ParcelaEntity> parcelaOpt = parcelaRepository.findById(idParcela);
-        Optional<CultivoEntity> cultivoOpt = cultivoRepository.findByNombre(nombreCultivo);
+        Optional<ParcelaEntity> parcelaOpt = parcelaRepositorio.findById(idParcela);
+        Optional<CultivoEntidad> cultivoOpt = cultivoRepositorio.findByNombre(nombreCultivo);
 
         if (parcelaOpt.isPresent() && cultivoOpt.isPresent()) {
             ParcelaEntity parcela = parcelaOpt.get();
             parcela.setCultivo(cultivoOpt.get());
-            parcelaRepository.save(parcela);
+            parcelaRepositorio.save(parcela);
         }
     }
 }

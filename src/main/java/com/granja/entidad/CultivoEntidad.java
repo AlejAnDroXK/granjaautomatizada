@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "cultivo")
-public class CultivoEntity {
+public class CultivoEntidad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,10 @@ public class CultivoEntity {
     @Column(name = "frecuencia_riego_horas", nullable = false)
     private int frecuenciaRiegoHoras;
 
-    public CultivoEntity() {
+    public CultivoEntidad() {
     }
 
-    public CultivoEntity(String nombre, int humedadMinima, int humedadMaxima, int frecuenciaRiegoHoras) {
+    public CultivoEntidad(String nombre, int humedadMinima, int humedadMaxima, int frecuenciaRiegoHoras) {
         this.nombre = nombre;
         this.humedadMinima = humedadMinima;
         this.humedadMaxima = humedadMaxima;

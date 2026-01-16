@@ -16,11 +16,11 @@ public class ParcelaEntity {
 
     @ManyToOne
     @JoinColumn(name = "cultivo_id")
-    private CultivoEntity cultivo;
+    private CultivoEntidad cultivo;
 
     @ManyToOne
     @JoinColumn(name = "usuario_creador_id")
-    private UsuarioEntity usuarioCreador;
+    private UsuarioEntidad usuarioCreador;
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
@@ -50,19 +50,19 @@ public class ParcelaEntity {
         this.metrosCuadrados = metrosCuadrados;
     }
 
-    public CultivoEntity getCultivo() {
+    public CultivoEntidad getCultivo() {
         return cultivo;
     }
 
-    public void setCultivo(CultivoEntity cultivo) {
+    public void setCultivo(CultivoEntidad cultivo) {
         this.cultivo = cultivo;
     }
 
-    public UsuarioEntity getUsuarioCreador() {
+    public UsuarioEntidad getUsuarioCreador() {
         return usuarioCreador;
     }
 
-    public void setUsuarioCreador(UsuarioEntity usuarioCreador) {
+    public void setUsuarioCreador(UsuarioEntidad usuarioCreador) {
         this.usuarioCreador = usuarioCreador;
     }
 
