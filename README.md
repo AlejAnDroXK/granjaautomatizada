@@ -1,80 +1,25 @@
-# My Application README
+# GranjaADM (Sistema administrativo para gestionar riego para granjas)
+[![Java-17](https://img.shields.io/badge/Java-17-red.svg?style=flat&logo=Java&logoColor=white)](https://www.azul.com/downloads/?version=java-21-lts&package=jdk#zulu)
+[![Spring-Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-green.svg?style=flat&logo=Springt&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Maven 3](https://img.shields.io/badge/Maven-3.x-blue.svg?style=flat&logo=Maven&logoColor=white)](https://maven.apache.org/download.cgi)
 
-- [ ] TODO Replace or update this README with instructions relevant to your application
+Portal Web para editar y administrar solicitudes la automatización de riego de cultivos para granjas.
 
-## Project Structure
+# Como compilar
 
-This project has the following structure:
+`mvn clean compile`
 
-```
-src
-├── main/java
-│   └── [application package]
-│       ├── base
-│       │   └── ui
-│       │       ├── ViewToolbar.java
-│       │       └── MainLayout.java
-│       ├── examplefeature
-│       │   ├── ui
-│       │   │   └── TaskListView.java
-│       │   ├── Task.java
-│       │   ├── TaskRepository.java
-│       │   └── TaskService.java                
-│       └── Application.java     
-├── main/resources
-│   ├── META-INF
-│   │   └── resources
-│   │       └── styles.css
-│   └── application.properties 
-└── test/java
-    └── [application package]
-        └── examplefeature
-           └── TaskServiceTest.java                 
-```
+`mvn vaadin:prepare-frontend`
 
-The main entry point into the application is `Application.java`. This class contains the `main()` method that starts up 
-the Spring Boot application.
+`mvn clean package -P production`
 
-The project follows a *feature-based package structure*, organizing code by *functional units* rather than traditional 
-architectural layers. It includes two feature packages: `base` and `examplefeature`.
+`mvn spring-boot:run`
 
-* The `base` package contains classes meant for reuse across different features, either through composition or 
-  inheritance. You can use them as-is, tweak them to your needs, or remove them.
-* The `examplefeature` package is an example feature package that demonstrates the structure. It represents a 
-  *self-contained unit of functionality*, including UI components, business logic, data access, and an integration test.
-  Once you create your own features, *you'll remove this package*.
+# Modulos
 
-
-## Starting in Development Mode
-
-To start the application in development mode, import it into your IDE and run the `Application` class. 
-You can also start the application from the command line by running: 
-
-```bash
-./mvnw
-```
-
-## Building for Production
-
-To build the application in production mode, run:
-
-```bash
-./mvnw package
-```
-
-To build a Docker image, run:
-
-```bash
-docker build -t my-application:latest .
-```
-
-If you use commercial components, pass the license key as a build secret:
-
-```bash
-docker build --secret id=proKey,src=$HOME/.vaadin/proKey .
-```
-
-## Next Steps
-
-The [Building Apps](https://vaadin.com/docs/v25/building-apps) guides contain hands-on advice for adding features to 
-your application.
+- Usuarios
+- Parcelas
+- Aspersores
+- Sensores
+- Cultivos
+- Riego automatico
