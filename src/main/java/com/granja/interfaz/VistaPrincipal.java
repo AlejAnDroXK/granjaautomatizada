@@ -22,13 +22,13 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("")
-public class MainView extends VerticalLayout {
+public class VistaPrincipal extends VerticalLayout {
     private final GranjaController controller;
     private VerticalLayout contentLayout;
     private HorizontalLayout userBar;
 
     @Autowired
-    public MainView(GranjaController controller) {
+    public VistaPrincipal(GranjaController controller) {
         this.controller = controller;
 
         setSizeFull();

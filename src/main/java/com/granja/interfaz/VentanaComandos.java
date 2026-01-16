@@ -17,7 +17,7 @@ import java.util.Scanner;
 @ComponentScan(basePackages = "com.granja")
 @EntityScan(basePackages = "com.granja.entidad")
 @EnableJpaRepositories(basePackages = "com.granja.repositorio")
-public class Main implements CommandLineRunner {
+public class VentanaComandos implements CommandLineRunner {
 
     @Autowired
     private GestorGranja gestorGranja;
@@ -29,7 +29,7 @@ public class Main implements CommandLineRunner {
 
     public static void main(String[] args) {
         System.setProperty("java.awt.headless", "false");
-        SpringApplication app = new SpringApplication(Main.class);
+        SpringApplication app = new SpringApplication(VentanaComandos.class);
         app.setHeadless(false);
         app.run(args);
     }
