@@ -1,10 +1,15 @@
 package com.granja.entidad;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lectura_humedad")
+@Getter
+@Setter
 public class LecturaHumedadEntidad {
 
     @Id
@@ -27,38 +32,6 @@ public class LecturaHumedadEntidad {
     public LecturaHumedadEntidad(String sensorId, LocalDateTime fecha, int porcentajeHumedad) {
         this.sensorId = sensorId;
         this.fecha = fecha;
-        this.porcentajeHumedad = porcentajeHumedad;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getSensorId() {
-        return sensorId;
-    }
-
-    public void setSensorId(String sensorId) {
-        this.sensorId = sensorId;
-    }
-
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
-    }
-
-    public int getPorcentajeHumedad() {
-        return porcentajeHumedad;
-    }
-
-    public void setPorcentajeHumedad(int porcentajeHumedad) {
         this.porcentajeHumedad = porcentajeHumedad;
     }
 }

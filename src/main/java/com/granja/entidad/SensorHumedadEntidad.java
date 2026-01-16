@@ -1,9 +1,13 @@
 package com.granja.entidad;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "sensor_humedad")
+@Getter
+@Setter
 public class SensorHumedadEntidad {
 
     @Id
@@ -27,37 +31,5 @@ public class SensorHumedadEntidad {
         this.id = id;
         this.conectado = false;
         this.humedadActual = 50;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public boolean isConectado() {
-        return conectado;
-    }
-
-    public void setConectado(boolean conectado) {
-        this.conectado = conectado;
-    }
-
-    public int getHumedadActual() {
-        return humedadActual;
-    }
-
-    public void setHumedadActual(int humedadActual) {
-        this.humedadActual = humedadActual;
-    }
-
-    public ParcelaEntity getParcela() {
-        return parcela;
-    }
-
-    public void setParcela(ParcelaEntity parcela) {
-        this.parcela = parcela;
     }
 }

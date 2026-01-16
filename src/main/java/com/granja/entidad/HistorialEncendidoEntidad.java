@@ -1,10 +1,15 @@
 package com.granja.entidad;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "historial_encendido")
+@Getter
+@Setter
 public class HistorialEncendidoEntidad {
 
     @Id
@@ -23,30 +28,6 @@ public class HistorialEncendidoEntidad {
 
     public HistorialEncendidoEntidad(String aspersorId, LocalDateTime fecha) {
         this.aspersorId = aspersorId;
-        this.fecha = fecha;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getAspersorId() {
-        return aspersorId;
-    }
-
-    public void setAspersorId(String aspersorId) {
-        this.aspersorId = aspersorId;
-    }
-
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 }

@@ -1,9 +1,13 @@
 package com.granja.entidad;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "cultivo")
+@Getter
+@Setter
 public class CultivoEntidad {
 
     @Id
@@ -30,46 +34,6 @@ public class CultivoEntidad {
         this.nombre = nombre;
         this.humedadMinima = humedadMinima;
         this.humedadMaxima = humedadMaxima;
-        this.frecuenciaRiegoHoras = frecuenciaRiegoHoras;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public int getHumedadMinima() {
-        return humedadMinima;
-    }
-
-    public void setHumedadMinima(int humedadMinima) {
-        this.humedadMinima = humedadMinima;
-    }
-
-    public int getHumedadMaxima() {
-        return humedadMaxima;
-    }
-
-    public void setHumedadMaxima(int humedadMaxima) {
-        this.humedadMaxima = humedadMaxima;
-    }
-
-    public int getFrecuenciaRiegoHoras() {
-        return frecuenciaRiegoHoras;
-    }
-
-    public void setFrecuenciaRiegoHoras(int frecuenciaRiegoHoras) {
         this.frecuenciaRiegoHoras = frecuenciaRiegoHoras;
     }
 }

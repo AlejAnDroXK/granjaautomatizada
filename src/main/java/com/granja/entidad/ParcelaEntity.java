@@ -1,10 +1,15 @@
 package com.granja.entidad;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "parcela")
+@Getter
+@Setter
 public class ParcelaEntity {
 
     @Id
@@ -34,43 +39,4 @@ public class ParcelaEntity {
         this.fechaCreacion = LocalDateTime.now();
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public double getMetrosCuadrados() {
-        return metrosCuadrados;
-    }
-
-    public void setMetrosCuadrados(double metrosCuadrados) {
-        this.metrosCuadrados = metrosCuadrados;
-    }
-
-    public CultivoEntidad getCultivo() {
-        return cultivo;
-    }
-
-    public void setCultivo(CultivoEntidad cultivo) {
-        this.cultivo = cultivo;
-    }
-
-    public UsuarioEntidad getUsuarioCreador() {
-        return usuarioCreador;
-    }
-
-    public void setUsuarioCreador(UsuarioEntidad usuarioCreador) {
-        this.usuarioCreador = usuarioCreador;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
 }

@@ -1,9 +1,13 @@
 package com.granja.entidad;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "aspersor")
+@Getter
+@Setter
 public class AspersorEntidad {
 
     @Id
@@ -27,37 +31,5 @@ public class AspersorEntidad {
         this.id = id;
         this.conectado = false;
         this.encendido = false;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public boolean isConectado() {
-        return conectado;
-    }
-
-    public void setConectado(boolean conectado) {
-        this.conectado = conectado;
-    }
-
-    public boolean isEncendido() {
-        return encendido;
-    }
-
-    public void setEncendido(boolean encendido) {
-        this.encendido = encendido;
-    }
-
-    public ParcelaEntity getParcela() {
-        return parcela;
-    }
-
-    public void setParcela(ParcelaEntity parcela) {
-        this.parcela = parcela;
     }
 }

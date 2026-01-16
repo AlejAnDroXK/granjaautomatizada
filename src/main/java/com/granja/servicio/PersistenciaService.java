@@ -3,7 +3,7 @@ package com.granja.servicio;
 import com.granja.entidad.*;
 import com.granja.modelo.*;
 import com.granja.repositorio.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -12,28 +12,22 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PersistenciaService {
 
-    @Autowired
-    private UsuarioRepositorio usuarioRepositorio;
+    private final UsuarioRepositorio usuarioRepositorio;
 
-    @Autowired
-    private ParcelaRepositorio parcelaRepositorio;
+    private final ParcelaRepositorio parcelaRepositorio;
 
-    @Autowired
-    private AspersorRepositorio aspersorRepositorio;
+    private final AspersorRepositorio aspersorRepositorio;
 
-    @Autowired
-    private SensorHumedadRepositorio sensorRepository;
+    private final SensorHumedadRepositorio sensorRepository;
 
-    @Autowired
-    private CultivoRepositorio cultivoRepositorio;
+    private final CultivoRepositorio cultivoRepositorio;
 
-    @Autowired
-    private LecturaHumedadRepositorio lecturaRepository;
+    private final LecturaHumedadRepositorio lecturaRepository;
 
-    @Autowired
-    private HistorialEncendidoRepositorio historialRepository;
+    private final HistorialEncendidoRepositorio historialRepository;
 
     public void guardarUsuario(Usuario usuario) {
         UsuarioEntidad entity = new UsuarioEntidad(
